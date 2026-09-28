@@ -1,4 +1,4 @@
-import QtQuick 2.0
+import QtQuick
 
 import "../lib"
 import "../lib/Requests.js" as Requests
@@ -74,47 +74,96 @@ Item {
 
 
 	//---
-	readonly property string authorizationCodeUrl: {
-		var url = 'https://accounts.google.com/o/oauth2/v2/auth'
-		url += '?scope=' + encodeURIComponent('https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/tasks')
-		url += '&response_type=code'
-		url += '&redirect_uri=' + encodeURIComponent('urn:ietf:wg:oauth:2.0:oob')
-		url += '&client_id=' + encodeURIComponent(plasmoid.configuration.latestClientId)
-		return url
+	// Google fully disabled the "out-of-band" (urn:ietf:wg:oauth:2.0:oob) flow used here
+	// previously. Rather than requiring a local redirect listener, this uses Google's device
+	// authorization flow (the same one CLI tools like gcloud/gh use): no redirect URI, no
+	// local server, just a short code the user enters at a Google URL while we poll for them
+	// approving it. https://developers.google.com/identity/protocols/oauth2/limited-input-device
+	property string deviceCode: ''
+	property string userCode: ''
+	property string verificationUrl: ''
+	property bool loggingIn: false
+	property string loginStatusMessage: ''
+
+	Timer {
+		id: pollTimer
+		repeat: true
+		onTriggered: session.pollForToken()
 	}
 
-	function fetchAccessToken(args) {
-		var url = 'https://www.googleapis.com/oauth2/v4/token'
+	function login() {
+		if (loggingIn) {
+			return
+		}
+		loggingIn = true
+		userCode = ''
+		verificationUrl = ''
+		loginStatusMessage = i18n("Requesting a login code from Google…")
 		Requests.post({
-			url: url,
+			url: 'https://oauth2.googleapis.com/device/code',
 			data: {
 				client_id: plasmoid.configuration.latestClientId,
-				client_secret: plasmoid.configuration.latestClientSecret,
-				code: args.authorizationCode,
-				grant_type: 'authorization_code',
-				redirect_uri: 'urn:ietf:wg:oauth:2.0:oob',
+				scope: 'https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/tasks',
 			},
 		}, function(err, data, xhr) {
-			logger.debug('/oauth2/v4/token Response', data)
-
-			// Check for errors
-			if (err) {
-				handleError(err, null)
-				return
-			}
 			try {
 				data = JSON.parse(data)
 			} catch (e) {
-				handleError('Error parsing /oauth2/v4/token data as JSON', null)
+				data = null
+			}
+			if (err || !data || data.error) {
+				cancelLogin()
+				session.error(i18n("Could not start Google login: %1", (data && (data.error_description || data.error)) || err || 'unknown_error'))
 				return
 			}
-			if (data && data.error) {
-				handleError(err, data)
-				return
-			}
+			deviceCode = data.device_code
+			userCode = data.user_code
+			verificationUrl = data.verification_url
+			loginStatusMessage = i18n("Waiting for you to approve access…")
+			pollTimer.interval = (data.interval || 5) * 1000
+			pollTimer.restart()
+		})
+	}
 
-			// Ready
-			updateAccessToken(data)
+	function cancelLogin() {
+		pollTimer.stop()
+		loggingIn = false
+		deviceCode = ''
+		userCode = ''
+		verificationUrl = ''
+		loginStatusMessage = ''
+	}
+
+	function pollForToken() {
+		Requests.post({
+			url: 'https://oauth2.googleapis.com/token',
+			data: {
+				client_id: plasmoid.configuration.latestClientId,
+				client_secret: plasmoid.configuration.latestClientSecret,
+				device_code: deviceCode,
+				grant_type: 'urn:ietf:params:oauth:grant-type:device_code',
+			},
+		}, function(err, data, xhr) {
+			try {
+				data = JSON.parse(data)
+			} catch (e) {
+				return // Transient/malformed response; just try again next poll.
+			}
+			if (data.access_token) {
+				pollTimer.stop()
+				loggingIn = false
+				loginStatusMessage = ''
+				updateAccessToken(data)
+			} else if (data.error === 'authorization_pending') {
+				// Keep polling; the user hasn't approved (or denied) it yet.
+			} else if (data.error === 'slow_down') {
+				pollTimer.interval += 5000
+			} else {
+				// access_denied, expired_token, or anything else Google sends back.
+				var reason = data.error_description || data.error || 'unknown_error'
+				cancelLogin()
+				session.error(i18n("Google login failed: %1", reason))
+			}
 		})
 	}
 

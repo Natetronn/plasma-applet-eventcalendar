@@ -1,9 +1,7 @@
-import QtQuick 2.0
-import QtQuick.Controls 1.1
-import QtQuick.Controls.Styles 1.1
-import QtQuick.Controls 2.0 as QQC2
-import QtQuick.Layouts 1.1
-import org.kde.kirigami 2.0 as Kirigami
+import QtQuick
+import QtQuick.Controls as QQC2
+import QtQuick.Layouts
+import org.kde.kirigami as Kirigami
 
 import ".."
 import "../lib"
@@ -46,7 +44,7 @@ ConfigPage {
 				var isPrimary = item.primary === true
 				var isShown = calendarIdList.indexOf(item.id) >= 0 || (isPrimary && calendarIdList.indexOf('primary') >= 0)
 				calendarsModel.append({
-					calendarId: item.id, 
+					calendarId: item.id,
 					name: item.summary,
 					description: item.description,
 					backgroundColor: item.backgroundColor,
@@ -67,7 +65,7 @@ ConfigPage {
 				// console.log(JSON.stringify(item))
 				var isShown = tasklistIdList.indexOf(item.id) >= 0
 				tasklistsModel.append({
-					tasklistId: item.id, 
+					tasklistId: item.id,
 					name: item.title,
 					description: '',
 					backgroundColor: Kirigami.Theme.highlightColor.toString(),
@@ -80,7 +78,7 @@ ConfigPage {
 			tasklistsModel.tasklistsShownChanged()
 		}
 
-		onError: messageWidget.err(err)
+		onError: function(err) { messageWidget.err(err) }
 	}
 
 
@@ -92,13 +90,13 @@ ConfigPage {
 	}
 	ColumnLayout {
 		visible: googleLoginManager.isLoggedIn
-		Label {
+		QQC2.Label {
 			Layout.fillWidth: true
 			text: i18n("Currently Synched.")
 			color: readablePositiveTextColor
 			wrapMode: Text.Wrap
 		}
-		Button {
+		QQC2.Button {
 			text: i18n("Logout")
 			onClicked: {
 				googleLoginManager.logout()
@@ -112,78 +110,82 @@ ConfigPage {
 	}
 	ColumnLayout {
 		visible: !googleLoginManager.isLoggedIn
-		Label {
+		QQC2.Label {
 			Layout.fillWidth: true
-			text: i18n("To sync with Google Calendar")
+			text: i18n("To sync with Google Calendar, set up your own OAuth client below, then login.")
 			color: readableNegativeTextColor
+			wrapMode: Text.Wrap
+		}
+		RowLayout {
+			visible: !googleLoginManager.loggingIn
+			QQC2.Button {
+				text: i18n("Login with Google")
+				onClicked: googleLoginManager.login()
+			}
+		}
+		ColumnLayout {
+			visible: googleLoginManager.loggingIn
+			QQC2.Label {
+				text: googleLoginManager.loginStatusMessage
+			}
+			LinkText {
+				visible: !!googleLoginManager.verificationUrl
+				text: i18n("Go to <a href=\"%1\">%1</a> and enter this code:", googleLoginManager.verificationUrl)
+				wrapMode: Text.Wrap
+			}
+			QQC2.Label {
+				visible: !!googleLoginManager.userCode
+				text: googleLoginManager.userCode
+				font.pixelSize: Kirigami.Units.gridUnit * 1.5
+				font.bold: true
+			}
+			QQC2.Button {
+				text: i18n("Cancel")
+				onClicked: googleLoginManager.cancelLogin()
+			}
+		}
+
+		HeaderText {
+			text: i18n("Google Cloud OAuth Client")
+			level: 3
+		}
+		QQC2.Label {
+			Layout.fillWidth: true
+			text: i18n("Google no longer allows widgets to share a single login client, so you'll need your own (free):")
 			wrapMode: Text.Wrap
 		}
 		LinkText {
 			Layout.fillWidth: true
-			text: i18n("Visit <a href=\"%1\">%2</a> (opens in your web browser). After you login and give permission to access your calendar, it will give you a code to paste below.", googleLoginManager.authorizationCodeUrl, 'https://accounts.google.com/...')
-			color: readableNegativeTextColor
+			text: i18n("1. Open <a href=\"%1\">Google Cloud Console</a> and create/select a project.", "https://console.cloud.google.com/apis/credentials")
 			wrapMode: Text.Wrap
-
-			// Tooltip
-			// QQC2.ToolTip.visible: !!hoveredLink
-			// QQC2.ToolTip.text: googleLoginManager.authorizationCodeUrl
-
-			// ContextMenu
-			MouseArea {
-				anchors.fill: parent
-				acceptedButtons: Qt.RightButton
-				onClicked: {
-					if (mouse.button === Qt.RightButton) {
-						contextMenu.popup()
-					}
-				}
-				onPressAndHold: {
-					if (mouse.source === Qt.MouseEventNotSynthesized) {
-						contextMenu.popup()
-					}
-				}
-
-				QQC2.Menu {
-					id: contextMenu
-					QQC2.MenuItem {
-						text: i18n("Copy Link")
-						onTriggered: clipboardHelper.copyText(googleLoginManager.authorizationCodeUrl)
-					}
-				}
-
-				TextEdit {
-					id: clipboardHelper
-					visible: false
-					function copyText(text) {
-						clipboardHelper.text = text
-						clipboardHelper.selectAll()
-						clipboardHelper.copy()
-					}
-				}
+		}
+		QQC2.Label {
+			Layout.fillWidth: true
+			text: i18n("2. Enable the Google Calendar API and Google Tasks API for that project.")
+			wrapMode: Text.Wrap
+		}
+		QQC2.Label {
+			Layout.fillWidth: true
+			text: i18n("3. Create an OAuth client ID of type \"TVs and Limited Input devices\" (this is Google's device-login flow, which needs no redirect URI).")
+			wrapMode: Text.Wrap
+		}
+		RowLayout {
+			QQC2.Label { text: i18n("Client ID:") }
+			ConfigString {
+				configKey: 'latestClientId'
+				placeholderText: i18n("Eg: 1234567890-abc...xyz.apps.googleusercontent.com")
+				Layout.fillWidth: true
 			}
 		}
 		RowLayout {
-			TextField {
-				id: authorizationCodeInput
+			QQC2.Label { text: i18n("Client Secret:") }
+			ConfigString {
+				configKey: 'latestClientSecret'
+				placeholderText: i18n("Eg: GOCSPX-...")
 				Layout.fillWidth: true
-
-				placeholderText: i18n("Enter code here (Eg: %1)", '1/2B3C4defghijklmnopqrst-uvwxyz123456789ab-cdeFGHIJKlmnio')
-				text: ""
-			}
-			Button {
-				text: i18n("Submit")
-				onClicked: {
-					if (authorizationCodeInput.text) {
-						googleLoginManager.fetchAccessToken({
-							authorizationCode: authorizationCodeInput.text,
-						})
-					} else {
-						messageWidget.err(i18n("Invalid Google Authorization Code"))
-					}
-				}
 			}
 		}
-		
+
 	}
 
 	RowLayout {
@@ -194,8 +196,8 @@ ConfigPage {
 			text: i18n("Calendars")
 		}
 
-		Button {
-			iconName: "view-refresh"
+		QQC2.Button {
+			icon.name: "view-refresh"
 			text: i18n("Refresh")
 			onClicked: googleLoginManager.updateCalendarList()
 		}
@@ -227,27 +229,27 @@ ConfigPage {
 
 			Repeater {
 				model: calendarsModel
-				delegate: CheckBox {
+				delegate: QQC2.CheckBox {
+					id: calendarCheckBox
 					text: model.name
 					checked: model.show
-					style: CheckBoxStyle {
-						label: RowLayout {
-							Rectangle {
-								Layout.fillHeight: true
-								Layout.preferredWidth: height
-								color: model.backgroundColor
-							}
-							Label {
-								id: labelText
-								text: control.text
-							}
-							LockIcon {
-								Layout.fillHeight: true
-								Layout.preferredWidth: height
-								visible: model.isReadOnly
-							}
+
+					contentItem: RowLayout {
+						anchors.left: calendarCheckBox.indicator.right
+						anchors.leftMargin: Kirigami.Units.smallSpacing
+						Rectangle {
+							Layout.fillHeight: true
+							Layout.preferredWidth: height
+							color: model.backgroundColor
 						}
-						
+						QQC2.Label {
+							text: model.name
+						}
+						LockIcon {
+							Layout.fillHeight: true
+							Layout.preferredWidth: height
+							visible: model.isReadOnly
+						}
 					}
 
 					onClicked: {
@@ -267,7 +269,7 @@ ConfigPage {
 			text: i18n("Tasks")
 
 			Image {
-				source: plasmoid.file("", "icons/google_tasks_96px.png")
+				source: Qt.resolvedUrl("../../icons/google_tasks_96px.png")
 				smooth: true
 				anchors.leftMargin: parent.contentWidth + Kirigami.Units.smallSpacing
 				anchors.left: parent.left
@@ -277,8 +279,8 @@ ConfigPage {
 			}
 		}
 
-		Button {
-			iconName: "view-refresh"
+		QQC2.Button {
+			icon.name: "view-refresh"
 			text: i18n("Refresh")
 			onClicked: googleLoginManager.updateTasklistList()
 		}
@@ -310,27 +312,27 @@ ConfigPage {
 
 			Repeater {
 				model: tasklistsModel
-				delegate: CheckBox {
+				delegate: QQC2.CheckBox {
+					id: tasklistCheckBox
 					text: model.name
 					checked: model.show
-					style: CheckBoxStyle {
-						label: RowLayout {
-							Rectangle {
-								Layout.fillHeight: true
-								Layout.preferredWidth: height
-								color: model.backgroundColor
-							}
-							Label {
-								id: labelText
-								text: control.text
-							}
-							LockIcon {
-								Layout.fillHeight: true
-								Layout.preferredWidth: height
-								visible: model.isReadOnly
-							}
+
+					contentItem: RowLayout {
+						anchors.left: tasklistCheckBox.indicator.right
+						anchors.leftMargin: Kirigami.Units.smallSpacing
+						Rectangle {
+							Layout.fillHeight: true
+							Layout.preferredWidth: height
+							color: model.backgroundColor
 						}
-						
+						QQC2.Label {
+							text: model.name
+						}
+						LockIcon {
+							Layout.fillHeight: true
+							Layout.preferredWidth: height
+							visible: model.isReadOnly
+						}
 					}
 
 					onClicked: {

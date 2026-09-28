@@ -347,10 +347,13 @@
 
 	<group name="Google Calendar">
 		<entry name="latestClientId" type="string">
-			<default>391436299960-k0s16nm589meovhoblpcquqgbbrena17.apps.googleusercontent.com</default>
+			<!-- No longer defaulted to a shared client: Google's OAuth loopback redirect
+			     (see GoogleLoginManager.qml) must be registered per-client, so each user
+			     needs their own Google Cloud OAuth client now. -->
+			<default></default>
 		</entry>
 		<entry name="latestClientSecret" type="string">
-			<default>Gdr_7lKIQuGBD4Up3MOiw-7i</default>
+			<default></default>
 		</entry>
 		<entry name="sessionClientId" type="string">
 			<default></default>
