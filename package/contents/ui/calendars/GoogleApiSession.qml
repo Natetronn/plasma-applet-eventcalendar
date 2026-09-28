@@ -44,7 +44,7 @@ QtObject {
 	signal newAccessToken()
 	signal transactionError(string msg)
 
-	onTransactionError: logger.log(msg)
+	onTransactionError: function(msg) { logger.log(msg) }
 
 	function applyAccessToken(data) {
 		plasmoid.configuration.accessToken = data.access_token
