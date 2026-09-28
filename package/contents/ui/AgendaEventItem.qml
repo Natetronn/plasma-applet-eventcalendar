@@ -24,8 +24,8 @@ LinkRect {
 	}
 	Connections {
 		target: timeModel
-		onLoaded: agendaEventItem.checkIfInProgress()
-		onMinuteChanged: agendaEventItem.checkIfInProgress()
+		function onLoaded() { agendaEventItem.checkIfInProgress() }
+		function onMinuteChanged() { agendaEventItem.checkIfInProgress() }
 	}
 	Component.onCompleted: {
 		agendaEventItem.checkIfInProgress()
@@ -176,7 +176,7 @@ LinkRect {
 				elide: Text.ElideRight
 
 				linkColor: Kirigami.Theme.highlightColor
-				onLinkActivated: Qt.openUrlExternally(link)
+				onLinkActivated: function(link) { Qt.openUrlExternally(link) }
 				MouseArea {
 					anchors.fill: parent
 					acceptedButtons: Qt.NoButton // we don't want to eat clicks on the Text
@@ -248,9 +248,9 @@ LinkRect {
 
 		menuItem = contextMenu.newMenuItem()
 		menuItem.text = i18n("Edit")
-		menuItem.icon = "edit-rename"
+		menuItem.icon.name = "edit-rename"
 		menuItem.enabled = event.canEdit
-		menuItem.clicked.connect(function() {
+		menuItem.triggered.connect(function() {
 			editEventForm.active = !editEventForm.active
 			agendaScrollView.positionViewAtEvent(agendaItemIndex, eventItemIndex)
 		})
@@ -258,12 +258,12 @@ LinkRect {
 
 		var deleteMenuItem = contextMenu.newSubMenu()
 		deleteMenuItem.text = i18n("Delete Event")
-		deleteMenuItem.icon = "delete"
+		deleteMenuItem.menuIcon = "delete"
 		menuItem = contextMenu.newMenuItem(deleteMenuItem)
 		menuItem.text = i18n("Confirm Deletion")
-		menuItem.icon = "delete"
+		menuItem.icon.name = "delete"
 		menuItem.enabled = event.canEdit
-		menuItem.clicked.connect(function() {
+		menuItem.triggered.connect(function() {
 			logger.debug('eventModel.deleteEvent', event.calendarId, event.id)
 			eventModel.deleteEvent(event.calendarId, event.id)
 		})
@@ -273,9 +273,9 @@ LinkRect {
 
 		menuItem = contextMenu.newMenuItem()
 		menuItem.text = i18n("Edit in browser")
-		menuItem.icon = "internet-web-browser"
+		menuItem.icon.name = "internet-web-browser"
 		menuItem.enabled = !!event.htmlLink
-		menuItem.clicked.connect(function() {
+		menuItem.triggered.connect(function() {
 			Qt.openUrlExternally(event.htmlLink)
 		})
 		contextMenu.addMenuItem(menuItem)
