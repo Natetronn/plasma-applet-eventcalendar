@@ -1,13 +1,10 @@
-import QtQuick 2.0
-import QtQuick.Controls 1.0
-import QtQuick.Controls.Styles 1.0
-import QtQuick.Dialogs 1.0
-import QtQuick.Layouts 1.0
-import org.kde.kirigami 2.0 as Kirigami
+import QtQuick
+import QtQuick.Controls as QQC2
+import QtQuick.Layouts
+import org.kde.kirigami as Kirigami
 
 import ".."
 import "../lib"
-import "../lib/Requests.js" as Requests
 
 ConfigPage {
 	id: page
@@ -39,7 +36,7 @@ ConfigPage {
 		text: i18n("Widgets")
 	}
 
-	Label {
+	QQC2.Label {
 		Layout.maximumWidth: page.width
 		wrapMode: Text.Wrap
 		text: i18n("Show/Hide widgets above the calendar. Toggle Agenda/Calendar on their respective tabs.")
@@ -80,16 +77,16 @@ ConfigPage {
 		}
 
 		LinkText {
-			text: '<a href="https://doc.qt.io/qt-5/qml-qtqml-qt.html#formatDateTime-method">' + i18n("Time Format Documentation") + '</a>'
+			text: '<a href="https://doc.qt.io/qt-6/qml-qtqml-qt.html#formatDateTime-method">' + i18n("Time Format Documentation") + '</a>'
 		}
 
-		Label {
+		QQC2.Label {
 			Layout.maximumWidth: page.width
 			wrapMode: Text.Wrap
 			text: i18n("The default font for the Breeze theme is Noto Sans which is hard to read with small text. Try using the Sans Serif font if you find the text too small when adding a second line.")
 		}
 
-		Label {
+		QQC2.Label {
 			Layout.maximumWidth: page.width
 			wrapMode: Text.Wrap
 			text: i18n("You can also use %1 or %2 to style a section. Note the single quotes around the tags are used to bypass the time format.", "<b>\'&lt;b&gt;\'ddd\'&lt;\/b&gt;\'</b>", "<b>\'&lt;font color=\"#77aaadd\"&gt;\'ddd\'&lt;\/font&gt;\'</b>")
@@ -103,17 +100,17 @@ ConfigPage {
 			}
 
 			RowLayout {
-				Label {
+				QQC2.Label {
 					text: i18n("Fixed Clock Height: ")
 				}
-				
+
 				ConfigSpinBox {
 					configKey: 'clockMaxHeight'
 					suffix: i18n("px")
 					minimumValue: 0
 				}
 
-				Label {
+				QQC2.Label {
 					text: i18n(" (0px = scale to fit)")
 				}
 			}
@@ -122,7 +119,7 @@ ConfigPage {
 		ConfigSection {
 			RowLayout {
 				Layout.fillWidth: true
-				CheckBox {
+				QQC2.CheckBox {
 					checked: true
 					text: i18n("Line 1:")
 					onCheckedChanged: checked = true
@@ -132,7 +129,7 @@ ConfigPage {
 					configKey: 'clockTimeFormat1'
 					placeholderText: localeTimeFormat
 				}
-				Label {
+				QQC2.Label {
 					text: Qt.formatDateTime(new Date(), line1TimeFormat)
 				}
 			}
@@ -140,23 +137,23 @@ ConfigPage {
 			RowLayout {
 				Layout.fillWidth: true
 				Text { width: indentWidth } // indent
-				Label {
+				QQC2.Label {
 					text: i18n("Preset:")
 				}
-				Button {
+				QQC2.Button {
 					text: Qt.formatDateTime(new Date(), timeFormat12hour)
 					onClicked: clockTimeFormat.value = timeFormat12hour
 				}
-				Button {
+				QQC2.Button {
 					text: Qt.formatDateTime(new Date(), timeFormat24hour)
 					onClicked: clockTimeFormat.value = timeFormat24hour
 				}
-				Button {
+				QQC2.Button {
 					property string dateFormat: Qt.locale().timeFormat(Locale.ShortFormat).replace('mm', 'mm:ss')
 					text: Qt.formatDateTime(new Date(), dateFormat)
 					onClicked: clockTimeFormat.value = dateFormat
 				}
-				Button {
+				QQC2.Button {
 					property string dateFormat: 'MMM d, ' + Qt.locale().timeFormat(Locale.ShortFormat)
 					text: Qt.formatDateTime(new Date(), dateFormat)
 					onClicked: clockTimeFormat.value = dateFormat
@@ -166,7 +163,7 @@ ConfigPage {
 			RowLayout {
 				Layout.fillWidth: true
 				Text { width: indentWidth } // indent
-				Label {
+				QQC2.Label {
 					text: i18n("Preset:")
 					color: "transparent"
 				}
@@ -204,7 +201,7 @@ ConfigPage {
 					configKey: 'clockTimeFormat2'
 					placeholderText: localeDateFormat
 				}
-				Label {
+				QQC2.Label {
 					text: Qt.formatDateTime(new Date(), line2TimeFormat)
 				}
 			}
@@ -212,10 +209,10 @@ ConfigPage {
 			RowLayout {
 				Layout.fillWidth: true
 				Text { width: indentWidth } // indent
-				Label {
+				QQC2.Label {
 					text: i18n("Preset:")
 				}
-				Button {
+				QQC2.Button {
 					property string dateFormat: {
 						// org.kde.plasma.digitalclock
 						// remove "dddd" from the locale format string
@@ -229,17 +226,17 @@ ConfigPage {
 					text: Qt.formatDate(new Date(), dateFormat)
 					onClicked: clockTimeFormat2.value = dateFormat
 				}
-				Button {
+				QQC2.Button {
 					property string dateFormat: Qt.locale().dateFormat(Locale.ShortFormat)
 					text: Qt.formatDate(new Date(), dateFormat)
 					onClicked: clockTimeFormat2.value = dateFormat
 				}
-				Button {
+				QQC2.Button {
 					property string dateFormat: 'MMM d'
 					text: Qt.formatDateTime(new Date(), dateFormat)
 					onClicked: clockTimeFormat2.value = dateFormat
 				}
-				Button {
+				QQC2.Button {
 					text: "Sans Serif"
 					onClicked: clockFontFamily.selectValue("Sans Serif")
 				}
@@ -275,19 +272,19 @@ ConfigPage {
 			level: 3
 		}
 		ConfigSection {
-			ExclusiveGroup { id: clockMousewheelGroup }
+			QQC2.ButtonGroup { id: clockMousewheelGroup }
 
-			RadioButton {
+			QQC2.RadioButton {
 				id: clockMousewheelGroupRunCommands
 				text: i18n("Run Commands")
-				exclusiveGroup: clockMousewheelGroup
+				QQC2.ButtonGroup.group: clockMousewheelGroup
 				checked: plasmoid.configuration.clockMouseWheel == 'RunCommands'
 				onClicked: plasmoid.configuration.clockMouseWheel = 'RunCommands'
 			}
 			RowLayout {
 				Layout.fillWidth: true
 				Text { width: indentWidth } // indent
-				Label {
+				QQC2.Label {
 					text: i18n("Scroll Up:")
 				}
 				ConfigString {
@@ -298,7 +295,7 @@ ConfigPage {
 			RowLayout {
 				Layout.fillWidth: true
 				Text { width: indentWidth } // indent
-				Label {
+				QQC2.Label {
 					text: i18n("Scroll Down:")
 				}
 				ConfigString {
@@ -307,17 +304,17 @@ ConfigPage {
 				}
 			}
 
-			RadioButton {
-				exclusiveGroup: clockMousewheelGroup
+			QQC2.RadioButton {
+				QQC2.ButtonGroup.group: clockMousewheelGroup
 				checked: false
 				text: i18n("Volume (No UI) (amixer)")
 				property string upCommand:   'amixer -q sset Master 10%+'
 				property string downCommand: 'amixer -q sset Master 10%-'
 				onClicked: setMouseWheelCommands(upCommand, downCommand)
 			}
-			
-			RadioButton {
-				exclusiveGroup: clockMousewheelGroup
+
+			QQC2.RadioButton {
+				QQC2.ButtonGroup.group: clockMousewheelGroup
 				checked: false
 				text: i18n("Volume (UI) (qdbus)")
 				property string upCommand:   'qdbus org.kde.kglobalaccel /component/kmix invokeShortcut "increase_volume"'
@@ -343,7 +340,7 @@ ConfigPage {
 		text: i18n("Debugging")
 	}
 	ConfigSection {
-		Label {
+		QQC2.Label {
 			text: i18n("Debugging will log sensitive information to:")
 				+ '<br/><b>Kubuntu:</b> ~/.xsession-errors'
 				+ '<br/><b>Arch/Manjaro:</b> journalctl -b0 _COMM=plasmashell'

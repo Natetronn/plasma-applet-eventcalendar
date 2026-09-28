@@ -1,117 +1,157 @@
-import QtQuick 2.0
-import QtQuick.Controls 1.0
-import QtQuick.Layouts 1.0
+import QtQuick
+import QtQuick.Controls as QQC2
+import QtQuick.Layouts
 
-import org.kde.plasma.private.digitalclock 1.0 as DigitalClock
+import org.kde.kitemmodels as KItemModels
+import org.kde.plasma.workspace.timezoneselector as Workspace
 
 import ".."
 import "../lib"
 
-// Mostly copied from digitalclock
+// Plasma 6 removed org.kde.plasma.private.digitalclock's TimeZoneModel/TimeZoneFilterProxy,
+// so this is rebuilt on top of Workspace.TimeZoneUtils.availableTimeZoneIds(), the only public
+// P6 API for listing IANA time zone ids.
 ColumnLayout { // ConfigPage creates a binding loop when a child uses fillHeight
 	id: page
-
-	function digitalclock_i18n(message) {
-		return i18nd("plasma_applet_org.kde.plasma.digitalclock", message)
-	}
-
-	DigitalClock.TimeZoneModel {
-		id: timeZoneModel
-
-		selectedTimeZones: plasmoid.configuration.selectedTimeZones
-		onSelectedTimeZonesChanged: plasmoid.configuration.selectedTimeZones = selectedTimeZones
-	}
 
 	MessageWidget {
 		id: messageWidget
 	}
 
-	TextField {
-		id: filter
-		Layout.fillWidth: true
-		placeholderText: digitalclock_i18n("Search Time Zones")
+	ListModel { id: timeZoneListModel }
+
+	function splitTimeZoneId(tzid) {
+		var parts = tzid.split('/')
+		var city = parts[parts.length - 1].replace(/_/g, ' ')
+		var region = parts.slice(0, parts.length - 1).join('/').replace(/_/g, ' ')
+		return { city: city, region: region }
 	}
 
-	TableView {
-		id: timeZoneView
+	function isSelected(tzid) {
+		return plasmoid.configuration.selectedTimeZones.indexOf(tzid) >= 0
+	}
+
+	function rebuildTimeZoneListModel() {
+		timeZoneListModel.clear()
+		timeZoneListModel.append({
+			tzid: 'Local',
+			city: i18n("Local"),
+			region: '',
+			comment: i18n("System time zone"),
+			checked: isSelected('Local'),
+		})
+		var tzids = Workspace.TimeZoneUtils.availableTimeZoneIds()
+		for (var i = 0; i < tzids.length; i++) {
+			var tzid = '' + tzids[i]
+			var parts = splitTimeZoneId(tzid)
+			timeZoneListModel.append({
+				tzid: tzid,
+				city: parts.city,
+				region: parts.region,
+				comment: tzid,
+				checked: isSelected(tzid),
+			})
+		}
+	}
+	Component.onCompleted: rebuildTimeZoneListModel()
+
+	function setChecked(tzid, checked) {
+		if (!checked && tzid === 'Local') {
+			messageWidget.warn(i18n("Cannot deselect Local time from the tooltip"))
+			return
+		}
+		var selected = plasmoid.configuration.selectedTimeZones.slice()
+		var idx = selected.indexOf(tzid)
+		if (checked && idx === -1) {
+			selected.push(tzid)
+		} else if (!checked && idx >= 0) {
+			selected.splice(idx, 1)
+		}
+		plasmoid.configuration.selectedTimeZones = selected
+
+		for (var i = 0; i < timeZoneListModel.count; i++) {
+			if (timeZoneListModel.get(i).tzid === tzid) {
+				timeZoneListModel.setProperty(i, 'checked', checked)
+				break
+			}
+		}
+	}
+
+	KItemModels.KSortFilterProxyModel {
+		id: filteredTimeZoneListModel
+		sourceModel: timeZoneListModel
+		filterRowCallback: function(sourceRow, sourceParent) {
+			if (!filter.text) return true
+			var item = timeZoneListModel.get(sourceRow)
+			var needle = filter.text.toLowerCase()
+			return item.city.toLowerCase().indexOf(needle) >= 0
+				|| item.region.toLowerCase().indexOf(needle) >= 0
+				|| item.tzid.toLowerCase().indexOf(needle) >= 0
+		}
+	}
+
+	QQC2.TextField {
+		id: filter
+		Layout.fillWidth: true
+		placeholderText: i18n("Search Time Zones")
+		onTextChanged: filteredTimeZoneListModel.invalidateFilter()
+	}
+
+	QQC2.ScrollView {
 		Layout.fillWidth: true
 		Layout.fillHeight: true
 
-		signal toggleCurrent
+		ListView {
+			id: timeZoneView
+			model: filteredTimeZoneListModel
+			clip: true
 
-		Keys.onSpacePressed: toggleCurrent()
+			delegate: QQC2.ItemDelegate {
+				width: timeZoneView.width
 
-		model: DigitalClock.TimeZoneFilterProxy {
-			sourceModel: timeZoneModel
-			filterString: filter.text
-		}
-
-		TableViewColumn {
-			role: "city"
-			title: digitalclock_i18n("City")
-		}
-		TableViewColumn {
-			role: "region"
-			title: digitalclock_i18n("Region")
-		}
-		TableViewColumn {
-			role: "comment"
-			title: digitalclock_i18n("Comment")
-		}
-		TableViewColumn {
-			role: "checked"
-			title: i18n("Tooltip")
-			delegate: CheckBox {
-				id: checkBox
-				anchors.centerIn: parent
-				checked: styleData.value
-				activeFocusOnTab: false // only let the TableView as a whole get focus
-
-				function setValue(checked) {
-					if (!checked && model.region == "Local") {
-						messageWidget.warn(i18n("Cannot deselect Local time from the tooltip"))
-					} else {
-						model.checked = checked // needed for model's setData to be called
+				contentItem: RowLayout {
+					QQC2.CheckBox {
+						checked: model.checked
+						activeFocusOnTab: false // only let the ListView as a whole get focus
+						onToggled: setChecked(model.tzid, checked)
 					}
-					checkBox.checked = Qt.binding(function(){ return styleData.value })
-				}
-
-				onClicked: checkBox.setValue(checked)
-
-				Connections {
-					target: timeZoneView
-					onToggleCurrent: {
-						if (styleData.row === timeZoneView.currentRow) {
-							checkBox.setValue(!checkBox.checked)
-						}
+					QQC2.Label {
+						text: model.city
+						Layout.preferredWidth: 200
+					}
+					QQC2.Label {
+						text: model.region
+						Layout.preferredWidth: 200
+					}
+					QQC2.Label {
+						text: model.comment
+						Layout.fillWidth: true
+						color: Qt.rgba(0, 0, 0, 0.5)
 					}
 				}
 			}
-
-			resizable: false
-			movable: false
 		}
 	}
 
 
-	ExclusiveGroup { id: timezoneDisplayType }
+	QQC2.ButtonGroup { id: timezoneDisplayType }
 	RowLayout {
-		Label {
-			text: digitalclock_i18n("Display time zone as:")
+		QQC2.Label {
+			text: i18n("Display time zone as:")
 		}
 
-		RadioButton {
+		QQC2.RadioButton {
 			id: timezoneCityRadio
-			text: digitalclock_i18n("Time zone city")
-			exclusiveGroup: timezoneDisplayType
+			text: i18n("Time zone city")
+			QQC2.ButtonGroup.group: timezoneDisplayType
 			checked: !plasmoid.configuration.displayTimezoneAsCode
 			onClicked: plasmoid.configuration.displayTimezoneAsCode = false
 		}
 
-		RadioButton {
+		QQC2.RadioButton {
 			id: timezoneCodeRadio
-			text: digitalclock_i18n("Time zone code")
-			exclusiveGroup: timezoneDisplayType
+			text: i18n("Time zone code")
+			QQC2.ButtonGroup.group: timezoneDisplayType
 			checked: plasmoid.configuration.displayTimezoneAsCode
 			onClicked: plasmoid.configuration.displayTimezoneAsCode = true
 		}

@@ -1,11 +1,10 @@
-import QtQuick 2.0
-import QtQuick.Controls 1.0
-import QtQuick.Controls.Styles 1.1
-import QtQuick.Dialogs 1.2
-import QtQuick.Layouts 1.0
-import org.kde.kirigami 2.0 as Kirigami
+import QtQuick
+import QtQuick.Controls as QQC2
+import QtQuick.Dialogs
+import QtQuick.Layouts
+import org.kde.kirigami as Kirigami
 
-import org.kde.kcoreaddons 1.0 as KCoreAddons
+import org.kde.kcoreaddons as KCoreAddons
 
 import ".."
 import "../lib"
@@ -48,13 +47,13 @@ ConfigPage {
 		HeaderText {
 			text: i18n("Calendars")
 		}
-		Button {
-			iconName: "resource-calendar-insert"
+		QQC2.Button {
+			icon.name: "resource-calendar-insert"
 			text: i18n("Add Calendar")
 			onClicked: calendarsModel.addCalendar()
 		}
-		Button {
-			iconName: "resource-calendar-insert"
+		QQC2.Button {
+			icon.name: "resource-calendar-insert"
 			text: i18n("New Calendar")
 			onClicked: calendarsModel.addNewCalendar()
 		}
@@ -69,12 +68,11 @@ ConfigPage {
 			delegate: RowLayout {
 				spacing: 0
 
-				CheckBox {
+				QQC2.CheckBox {
 					Layout.preferredHeight: labelTextField.height
 					Layout.preferredWidth: height
 					Layout.alignment: Qt.AlignTop
 					checked: show
-					style: CheckBoxStyle {}
 
 					onClicked: {
 						calendarsModel.setProperty(index, 'show', checked)
@@ -87,27 +85,27 @@ ConfigPage {
 							Layout.preferredWidth: height
 							color: model.backgroundColor
 						}
-						TextField {
+						QQC2.TextField {
 							id: labelTextField
 							Layout.fillWidth: true
 							text: model.name
 							placeholderText: i18n("Calendar Label")
 						}
-						Button {
-							iconName: "trash-empty"
+						QQC2.Button {
+							icon.name: "trash-empty"
 							onClicked: calendarsModel.removeIndex(index)
 						}
 					}
 					RowLayout {
-						TextField {
+						QQC2.TextField {
 							id: calendarUrlField
 							Layout.fillWidth: true
 							text: model.url
 							onTextChanged: calendarsModel.setItemProperty(index, 'url', text)
 						}
 
-						Button {
-							iconName: "folder-open"
+						QQC2.Button {
+							icon.name: "folder-open"
 							text: i18n("Browse")
 							onClicked: {
 								filePicker.open()
@@ -118,8 +116,8 @@ ConfigPage {
 
 								nameFilters: [ i18n("iCalendar (*.ics)") ]
 
-								onFileUrlChanged: {
-									calendarUrlField.text = fileUrl
+								onAccepted: {
+									calendarUrlField.text = selectedFile
 								}
 							}
 						}

@@ -1,7 +1,7 @@
-import QtQuick 2.0
-import QtQuick.Controls 1.0
-import QtQuick.Layouts 1.0
-import org.kde.plasma.extras 2.0 as PlasmaExtras
+import QtQuick
+import QtQuick.Controls as QQC2
+import QtQuick.Layouts
+import org.kde.plasma.extras as PlasmaExtras
 
 import ".."
 import "../lib"
@@ -26,7 +26,7 @@ ConfigPage {
 	ConfigSection {
 		RowLayout {
 			visible: plasmoid.configuration.debugging && weatherService.value === 'OpenWeatherMap'
-			Label {
+			QQC2.Label {
 				text: i18n("API App Id:")
 			}
 			ConfigString {
@@ -36,7 +36,7 @@ ConfigPage {
 
 		RowLayout {
 			visible: weatherService.value === 'OpenWeatherMap'
-			Label {
+			QQC2.Label {
 				text: i18n("City Id:")
 			}
 			ConfigString {
@@ -44,7 +44,7 @@ ConfigPage {
 				configKey: 'openWeatherMapCityId'
 				placeholderText: i18n("Eg: 5983720")
 			}
-			Button {
+			QQC2.Button {
 				text: i18n("Find City")
 				onClicked: openWeatherMapCityDialog.open()
 			}
@@ -59,7 +59,7 @@ ConfigPage {
 
 		RowLayout {
 			visible: weatherService.value === 'WeatherCanada'
-			Label {
+			QQC2.Label {
 				text: i18n("City Id:")
 			}
 			ConfigString {
@@ -67,7 +67,7 @@ ConfigPage {
 				configKey: 'weatherCanadaCityId'
 				placeholderText: i18n("Eg: on-14")
 			}
-			Button {
+			QQC2.Button {
 				text: i18n("Find City")
 				onClicked: weatherCanadaCityDialog.open()
 			}

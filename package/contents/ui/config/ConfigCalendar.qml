@@ -1,6 +1,6 @@
-import QtQuick 2.0
-import QtQuick.Controls 1.0
-import QtQuick.Layouts 1.0
+import QtQuick
+import QtQuick.Controls as QQC2
+import QtQuick.Layouts
 
 import "../lib"
 
@@ -16,9 +16,9 @@ ConfigPage {
 		ConfigRadioButtonGroup {
 			id: clickDateGroup
 			label: i18n("Click Date:")
-			RadioButton {
+			QQC2.RadioButton {
 				text: i18n("Scroll to event in Agenda")
-				exclusiveGroup: clickDateGroup.exclusiveGroup
+				QQC2.ButtonGroup.group: clickDateGroup.exclusiveGroup
 				checked: true
 			}
 		}
@@ -42,7 +42,7 @@ ConfigPage {
 	ConfigSection {
 		RowLayout {
 			Layout.fillWidth: true
-			Label {
+			QQC2.Label {
 				text: i18n("Current Month Title:")
 			}
 			ConfigString {
@@ -50,7 +50,7 @@ ConfigPage {
 				configKey: 'monthCurrentCustomTitleFormat'
 				placeholderText: i18nc("calendar title format for current month", "MMMM d, yyyy")
 			}
-			Label {
+			QQC2.Label {
 				text: Qt.formatDateTime(new Date(), monthCurrentCustomTitleFormat.value)
 			}
 		}
@@ -68,10 +68,10 @@ ConfigPage {
 			text: i18n("Highlight Current Day / Week")
 		}
 		RowLayout {
-			Label {
+			QQC2.Label {
 				text: i18n("First day of week:")
 			}
-			ComboBox {
+			QQC2.ComboBox {
 				// [-1, 0, 1, 2, 3, 4, 5, 6] // Default = -1, 0..6 = Sun..Sat
 				model: ListModel {}
 				textRole: "text"
@@ -120,9 +120,9 @@ ConfigPage {
 		ConfigRadioButtonGroup {
 			id: selectedStyleGroup
 			label: i18n("Selected:")
-			RadioButton {
+			QQC2.RadioButton {
 				text: i18n("Solid Color (Highlight)")
-				exclusiveGroup: selectedStyleGroup.exclusiveGroup
+				QQC2.ButtonGroup.group: selectedStyleGroup.exclusiveGroup
 				checked: true
 			}
 		}

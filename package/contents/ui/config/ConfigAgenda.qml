@@ -1,7 +1,7 @@
-import QtQuick 2.0
-import QtQuick.Controls 1.0
-import QtQuick.Layouts 1.0
-import org.kde.kirigami 2.0 as Kirigami
+import QtQuick
+import QtQuick.Controls as QQC2
+import QtQuick.Layouts
+import org.kde.kirigami as Kirigami
 
 import ".."
 import "../lib"
@@ -67,9 +67,9 @@ ConfigPage {
 		ConfigRadioButtonGroup {
 			id: clickWeatherGroup
 			label: i18n("Click Weather:")
-			RadioButton {
+			QQC2.RadioButton {
 				text: i18n("Open City Forecast In Browser")
-				exclusiveGroup: clickWeatherGroup.exclusiveGroup
+				QQC2.ButtonGroup.group: clickWeatherGroup.exclusiveGroup
 				checked: true
 			}
 		}
@@ -79,14 +79,14 @@ ConfigPage {
 		ConfigRadioButtonGroup {
 			id: clickDateGroup
 			label: i18n("Click Date:")
-			RadioButton {
+			QQC2.RadioButton {
 				text: i18n("Open New Event In Browser")
-				exclusiveGroup: clickDateGroup.exclusiveGroup
+				QQC2.ButtonGroup.group: clickDateGroup.exclusiveGroup
 				enabled: false
 			}
-			RadioButton {
+			QQC2.RadioButton {
 				text: i18n("Open New Event Form")
-				exclusiveGroup: clickDateGroup.exclusiveGroup
+				QQC2.ButtonGroup.group: clickDateGroup.exclusiveGroup
 				checked: true
 			}
 		}
@@ -114,9 +114,9 @@ ConfigPage {
 		ConfigRadioButtonGroup {
 			id: clickEventGroup
 			label: i18n("Click Event:")
-			RadioButton {
+			QQC2.RadioButton {
 				text: i18n("Open Event In Browser")
-				exclusiveGroup: clickEventGroup.exclusiveGroup
+				QQC2.ButtonGroup.group: clickEventGroup.exclusiveGroup
 				checked: true
 			}
 		}
@@ -144,17 +144,17 @@ ConfigPage {
 	ConfigSection {
 		title: i18n("Current Month")
 
-		CheckBox {
+		QQC2.CheckBox {
 			enabled: false
 			checked: true
 			text: i18n("Always show next 14 days")
 		}
-		CheckBox {
+		QQC2.CheckBox {
 			enabled: false
 			checked: false
 			text: i18n("Hide completed events")
 		}
-		CheckBox {
+		QQC2.CheckBox {
 			enabled: false
 			checked: true
 			text: i18n("Show all events of the current day (including completed events)")

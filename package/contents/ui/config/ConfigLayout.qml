@@ -1,8 +1,8 @@
-import QtQuick 2.0
-import QtQuick.Controls 1.0
-import QtQuick.Layouts 1.0
-import org.kde.kirigami 2.0 as Kirigami
-import QtGraphicalEffects 1.0 // Colorize
+import QtQuick
+import QtQuick.Controls as QQC2
+import QtQuick.Layouts
+import org.kde.kirigami as Kirigami
+import Qt5Compat.GraphicalEffects as QtGraphicalEffects // TODO Deprecated in Qt6 // Colorize
 
 import ".."
 import "../lib"
@@ -15,10 +15,10 @@ ConfigPage {
 	}
 
 	//---
-	ExclusiveGroup { id: layoutGroup }
-	RadioButton {
+	QQC2.ButtonGroup { id: layoutGroup }
+	QQC2.RadioButton {
 		text: i18n("Calendar to the left of the Agenda (Two Columns)")
-		exclusiveGroup: layoutGroup
+		QQC2.ButtonGroup.group: layoutGroup
 		checked: plasmoid.configuration.twoColumns
 		onClicked: plasmoid.configuration.twoColumns = true
 		Layout.fillWidth: false
@@ -85,12 +85,12 @@ ConfigPage {
 			Image {
 				id: twoColumnsImage
 				anchors.fill: parent
-				source: plasmoid.file("", "images/twocolumns.svg")
+				source: Qt.resolvedUrl("../../images/twocolumns.svg")
 				smooth: true
 				visible: false
 			}
 
-			ColorOverlay {
+			QtGraphicalEffects.ColorOverlay {
 				anchors.fill: parent
 				source: twoColumnsImage
 				color: syspal.text
@@ -105,9 +105,9 @@ ConfigPage {
 	}
 
 	//---
-	RadioButton {
+	QQC2.RadioButton {
 		text: i18n("Agenda below the Calendar (Single Column)")
-		exclusiveGroup: layoutGroup
+		QQC2.ButtonGroup.group: layoutGroup
 		checked: !plasmoid.configuration.twoColumns
 		onClicked: plasmoid.configuration.twoColumns = false
 		Layout.fillWidth: false
@@ -169,12 +169,12 @@ ConfigPage {
 			Image {
 				id: singleColumnImage
 				anchors.fill: parent
-				source: plasmoid.file("", "images/singlecolumn.svg")
+				source: Qt.resolvedUrl("../../images/singlecolumn.svg")
 				smooth: true
 				visible: false
 			}
 
-			ColorOverlay {
+			QtGraphicalEffects.ColorOverlay {
 				anchors.fill: parent
 				source: singleColumnImage
 				color: syspal.text
