@@ -9,8 +9,6 @@ import org.kde.plasma.plasma5support as Plasma5Support
 import org.kde.config as KConfig
 import org.kde.kcmutils as KCMUtils
 
-import org.kde.plasma.private.digitalclock as DigitalClock
-
 import "./lib"
 
 PlasmoidItem {
@@ -47,11 +45,18 @@ PlasmoidItem {
 		source: "../fonts/weathericons-regular-webfont.ttf"
 	}
 
-	Connections {
-		target: plasmoid
-		function onContextualActionsAboutToShow() {
-			DigitalClock.ClipboardMenu.currentDate = timeModel.currentTime
+	TextEdit {
+		id: clipboardHelper
+		visible: false
+		function copyText(text) {
+			clipboardHelper.text = text
+			clipboardHelper.selectAll()
+			clipboardHelper.copy()
 		}
+	}
+
+	function copyCurrentDateTime() {
+		clipboardHelper.copyText(Qt.formatDateTime(timeModel.currentTime, Qt.locale().dateTimeFormat(Locale.LongFormat)))
 	}
 
 	toolTipItem: Loader {
@@ -69,7 +74,9 @@ PlasmoidItem {
 		id: executable
 		engine: "executable"
 		connectedSources: []
-		onNewData: disconnectSource(sourceName) // cmd finished
+		function onNewData(sourceName, data) {
+			disconnectSource(sourceName) // cmd finished
+		}
 		function getUniqueId(cmd) {
 			// Note: we assume that 'cmd' is executed quickly so that a previous call
 			// with the same 'cmd' has already finished (otherwise no new cmd will be
@@ -99,13 +106,13 @@ PlasmoidItem {
 
 			property int wheelDelta: 0
 
-			onClicked: {
+			onClicked: function(mouse) {
 				if (mouse.button == Qt.LeftButton) {
-					plasmoid.expanded = !plasmoid.expanded
+					root.expanded = !root.expanded
 				}
 			}
 
-			onWheel: {
+			onWheel: function(wheel) {
 				var delta = wheel.angleDelta.y || wheel.angleDelta.x
 				wheelDelta += delta
 
@@ -155,7 +162,7 @@ PlasmoidItem {
 			}
 		}
 
-		property bool isExpanded: plasmoid.expanded
+		property bool isExpanded: root.expanded
 		onIsExpandedChanged: {
 			logger.debug('isExpanded', isExpanded)
 			if (isExpanded) {
@@ -180,16 +187,10 @@ PlasmoidItem {
 
 		Connections {
 			target: timeModel
-			onDateChanged: {
+			function onDateChanged() {
 				popup.updateToday()
 				logger.debug('root.onDateChanged', timeModel.currentTime, popup.today)
 			}
-		}
-
-		Binding {
-			target: plasmoid
-			property: "hideOnWindowDeactivate"
-			value: !plasmoid.configuration.pin
 		}
 
 		// Allows the user to keep the calendar open for reference
@@ -208,9 +209,10 @@ PlasmoidItem {
 	}
 
 	Plasmoid.backgroundHints: plasmoid.configuration.showBackground ? PlasmaCore.Types.DefaultBackground : PlasmaCore.Types.NoBackground
+	hideOnWindowDeactivate: !plasmoid.configuration.pin
 
 	property bool isDesktopContainment: plasmoid.location == PlasmaCore.Types.Floating
-	preferredRepresentation: isDesktopContainment ? Plasmoid.fullRepresentation : Plasmoid.compactRepresentation
+	preferredRepresentation: isDesktopContainment ? root.fullRepresentation : root.compactRepresentation
 	compactRepresentation: clockComponent
 	fullRepresentation: popupComponent
 
@@ -219,6 +221,7 @@ PlasmoidItem {
 			id: clipboardAction
 			text: i18n("Copy to Clipboard")
 			icon.name: "edit-copy"
+			onTriggered: copyCurrentDateTime()
 		},
 		PlasmaCore.Action {
 			text: i18nd("plasma_applet_org.kde.plasma.digitalclock", "Adjust Date and Time…")
@@ -236,12 +239,6 @@ PlasmoidItem {
 			onTriggered: KCMUtils.KCMLauncher.openSystemSettings("kcm_regionandlang")
 		}
 	]
-
-	Component.onCompleted: {
-		DigitalClock.ClipboardMenu.setupMenu(clipboardAction)
-
-		// Plasmoid.internalAction("configure").trigger()
-	}
 
 	// Timer {
 	// 	interval: 400
