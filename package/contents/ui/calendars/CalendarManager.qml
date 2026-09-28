@@ -124,14 +124,14 @@ Item {
 	// SubClass.onEventParsing
 	// CalendarManager.defaultEventParsing
 	// SubClass.onCalendarParsing
-	onCalendarParsing: {
+	function onCalendarParsing(calendarId, data) {
 		// logger.debug('CalendarManager.calendarParsing(', calendarManager, ')', calendarId)
 		data.items.forEach(function(event) {
 			eventParsing(calendarId, event)
 			defaultEventParsing(calendarId, event)
 		})
 	}
-	onEventParsing: {
+	function onEventParsing(calendarId, event) {
 		// logger.debug('CalendarManager.eventParsing(', calendarManager, ')', calendarId)
 	}
 

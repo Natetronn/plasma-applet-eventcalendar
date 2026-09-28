@@ -7,6 +7,11 @@ import "../ui/calendars/PlasmaCalendarUtils.js" as PlasmaCalendarUtils
 ConfigModel {
 	id: configModel
 
+	// Plasma 6: EventPluginsManager is no longer a singleton, so it must be instantiated.
+	// Assigned to a property (rather than declared as a bare child) since ConfigModel's
+	// default property only accepts ConfigCategory items.
+	property var eventPluginsManager: PlasmaCalendar.EventPluginsManager {}
+
 	ConfigCategory {
 		name: i18n("General")
 		icon: "clock"
@@ -50,7 +55,7 @@ ConfigModel {
 	}
 	ConfigCategory {
 		name: i18n("Google Calendar")
-		icon: plasmoid.file("", "icons/google_calendar_96px.png")
+		icon: Qt.resolvedUrl("../icons/google_calendar_96px.png")
 		source: "config/ConfigGoogleCalendar.qml"
 	}
 	ConfigCategory {
@@ -66,16 +71,16 @@ ConfigModel {
 	}
 
 	property Instantiator __eventPlugins: Instantiator {
-		model: PlasmaCalendar.EventPluginsManager.model
+		model: eventPluginsManager.model
 		delegate: ConfigCategory {
 			name: model.display
 			icon: model.decoration
 			source: model.configUi
-			readonly property string pluginFilename: PlasmaCalendarUtils.getPluginFilename(model.pluginPath)
+			readonly property string pluginFilename: PlasmaCalendarUtils.pluginIdToFilename(model.pluginId)
 			visible: plasmoid.configuration.enabledCalendarPlugins.indexOf(pluginFilename) > -1
 		}
 
-		onObjectAdded: configModel.appendCategory(object)
-		onObjectRemoved: configModel.removeCategory(object)
+		onObjectAdded: function(index, object) { configModel.appendCategory(object) }
+		onObjectRemoved: function(index, object) { configModel.removeCategory(object) }
 	}
 }

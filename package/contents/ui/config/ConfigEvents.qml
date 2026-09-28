@@ -1,8 +1,8 @@
-import QtQuick 2.0
-import QtQuick.Controls 1.0
-import QtQuick.Layouts 1.0
+import QtQuick
+import QtQuick.Controls as QQC2
+import QtQuick.Layouts
 
-import org.kde.plasma.calendar 2.0 as PlasmaCalendar
+import org.kde.plasma.workspace.calendar as PlasmaCalendar
 
 import "../lib"
 import "../calendars/PlasmaCalendarUtils.js" as PlasmaCalendarUtils
@@ -10,18 +10,23 @@ import "../calendars/PlasmaCalendarUtils.js" as PlasmaCalendarUtils
 ConfigPage {
 	id: page
 
+	// Plasma 6: EventPluginsManager is no longer a singleton, so it must be instantiated.
+	PlasmaCalendar.EventPluginsManager {
+		id: eventPluginsManager
+	}
+
 	HeaderText {
 		text: i18n("Event Calendar Plugins")
 	}
 
 	ConfigSection {
-		CheckBox {
+		QQC2.CheckBox {
 			text: i18n("ICalendar (.ics)")
 			checked: true
 			enabled: false
 			visible: plasmoid.configuration.debugging
 		}
-		CheckBox {
+		QQC2.CheckBox {
 			text: i18n("Google Calendar")
 			checked: true
 			enabled: false
@@ -38,8 +43,8 @@ ConfigPage {
 	ConfigSection {
 		Repeater {
 			id: calendarPluginsRepeater
-			model: PlasmaCalendar.EventPluginsManager.model
-			delegate: CheckBox {
+			model: eventPluginsManager.model
+			delegate: QQC2.CheckBox {
 				text: model.display
 				checked: model.checked
 				onClicked: {
@@ -51,10 +56,10 @@ ConfigPage {
 		}
 	}
 	function saveConfig() {
-		plasmoid.configuration.enabledCalendarPlugins = PlasmaCalendarUtils.pluginPathToFilenameList(PlasmaCalendar.EventPluginsManager.enabledPlugins)
+		plasmoid.configuration.enabledCalendarPlugins = PlasmaCalendarUtils.pluginIdListToFilenameList(eventPluginsManager.enabledPlugins)
 	}
 	Component.onCompleted: {
-		PlasmaCalendarUtils.populateEnabledPluginsByFilename(PlasmaCalendar.EventPluginsManager, plasmoid.configuration.enabledCalendarPlugins)
+		PlasmaCalendarUtils.populateEnabledPluginsByFilename(eventPluginsManager, plasmoid.configuration.enabledCalendarPlugins)
 	}
 
 	HeaderText {

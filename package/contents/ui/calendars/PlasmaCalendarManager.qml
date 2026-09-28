@@ -71,7 +71,7 @@ CalendarManager {
 
 		// KHolidays
 		calendarList.push({
-			"calendarId": "plasma_Holidays",
+			"id": "plasma_Holidays",
 			"backgroundColor": "" + Kirigami.Theme.highlightColor,
 			"accessRole": "reader",
 			"isTasklist": false,
@@ -100,13 +100,18 @@ CalendarManager {
 	// So we need to use PlasmaCalendar.Calendar which has a DaysModel property that has a function
 	// to get a list of events for a specific day.
 
+	// Plasma 6: EventPluginsManager is no longer a singleton, so it must be instantiated.
+	PlasmaCalendar.EventPluginsManager {
+		id: eventPluginsManager
+	}
+
 	Component.onCompleted: {
-		PlasmaCalendarUtils.setEnabledPluginsByFilename(PlasmaCalendar.EventPluginsManager, plasmoid.configuration.enabledCalendarPlugins)
+		PlasmaCalendarUtils.setEnabledPluginsByFilename(eventPluginsManager, plasmoid.configuration.enabledCalendarPlugins)
 	}
 	Connections {
 		target: plasmoid.configuration
-		onEnabledCalendarPluginsChanged: {
-			PlasmaCalendarUtils.setEnabledPluginsByFilename(PlasmaCalendar.EventPluginsManager, plasmoid.configuration.enabledCalendarPlugins)
+		function onEnabledCalendarPluginsChanged() {
+			PlasmaCalendarUtils.setEnabledPluginsByFilename(eventPluginsManager, plasmoid.configuration.enabledCalendarPlugins)
 		}
 	}
 
@@ -127,19 +132,20 @@ CalendarManager {
 
 		Component.onCompleted: {
 			//daysModel.connect
-			daysModel.setPluginsManager(PlasmaCalendar.EventPluginsManager)
+			daysModel.setPluginsManager(eventPluginsManager)
 		}
 	}
 
-	readonly property string translatedHolidaysType: i18ndc("libplasma5", "Agenda listview section title", "Holidays")
-	readonly property string translatedEventsType: i18ndc("libplasma5", "Agenda listview section title", "Events")
-	readonly property string translatedTodoType: i18ndc("libplasma5", "Agenda listview section title", "Todo")
-	readonly property string translatedOtherType: i18ndc("libplasma5", "Means 'Other calendar items'", "Other")
+	readonly property string translatedHolidaysType: i18ndc("plasmashellprivateplugin", "Agenda listview section title", "Holidays")
+	readonly property string translatedEventsType: i18ndc("plasmashellprivateplugin", "Agenda listview section title", "Events")
+	readonly property string translatedTodoType: i18ndc("plasmashellprivateplugin", "Agenda listview section title", "Todo")
+	readonly property string translatedOtherType: i18ndc("plasmashellprivateplugin", "Means 'Other calendar items'", "Other")
 	function parseCalendarId(dayItem) {
 		// dayItem.eventType is translated, but is the only way to tell which plugin it belongs to without
 		// creating a seperate PlasmaCalendar.EventPluginsManager for each plugin (assuming it's not a singleton).
-		// https://github.com/KDE/plasma-framework/blob/master/src/declarativeimports/calendar/eventdatadecorator.cpp#L60
-		// plasma-framework uses the "libplasma5" translation domain.
+		// https://invent.kde.org/plasma/plasma-workspace/-/blob/master/components/calendar/eventdatadecorator.cpp
+		// plasma-workspace's components/calendar uses the "plasmashellprivateplugin" translation domain
+		// (see components/CMakeLists.txt), not "libplasma5"/"libplasma6" as one might guess.
 		if (dayItem.eventType == translatedHolidaysType) {
 			return calendarManagerId + "_Holidays"
 		} else if (dayItem.eventType == translatedEventsType) {
@@ -310,7 +316,7 @@ CalendarManager {
 		}
 	}
 
-	onCalendarParsing: {
+	function onCalendarParsing(calendarId, data) {
 		var calendar = getCalendar(calendarId)
 		parseEventList(calendar, data.items)
 	}

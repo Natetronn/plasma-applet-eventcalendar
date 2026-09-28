@@ -251,7 +251,7 @@ CalendarManager {
 	}
 
 	//--- Parsing Events
-	onCalendarParsing: {
+	function onCalendarParsing(calendarId, data) {
 		var calendar = getCalendar(calendarId)
 		data.items.forEach(function(event){
 			parseEvent(calendar, event)
