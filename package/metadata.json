@@ -5,10 +5,14 @@
 			{
 				"Email": "zrenfire@gmail.com",
 				"Name": "Chris Holland"
+			},
+			{
+				"Email": "natetronn@gmail.com",
+				"Name": "Nathan Doyle"
 			}
 		],
 		"Category": "Date and Time",
-		"Description": "Plasmoid for a calendar+agenda with weather that syncs to Google Calendar.",
+		"Description": "Plasmoid for a calendar+agenda with weather that syncs to Google Calendar. Plasma 6 port.",
 		"Description[de]": "Miniprogramm für einen Kalender mit Ereignisansicht und Wetter, der Ereignisse mit Google Kalender synchronisiert.",
 		"Description[es]": "Plasmoid para calendario + agenda con información del clima. Sincroniza con Google Calendar.",
 		"Description[fi]": "Plasmoidi kalenteri + agenda säätietoineen synkronoitu Google Calendarin kanssa.",
@@ -42,8 +46,8 @@
 		"Name[sl]": "Koledar z dnevnim redom",
 		"Name[tr]": "Etkinlik Takvimi",
 		"Name[uk]": "Календар подій",
-		"Version": "76",
-		"Website": "https://github.com/Zren/plasma-applet-eventcalendar"
+		"Version": "76.1",
+		"Website": "https://github.com/Natetronn/plasma-applet-eventcalendar"
 	},
 	"X-KDE-PluginInfo-KdeStoreId": "998901",
 	"X-Plasma-API-Minimum-Version": "6.0",

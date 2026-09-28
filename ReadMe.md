@@ -4,6 +4,23 @@ https://store.kde.org/p/998901/
 
 Plasmoid for a calendar+agenda with weather that syncs to Google Calendar.
 
+## Plasma 6 fork
+
+This `plasma6` branch is a Plasma 6 / Qt6 port maintained by Nathan Doyle
+([@Natetronn](https://github.com/Natetronn/plasma-applet-eventcalendar)), built on top of
+[Chris Holland's](https://github.com/Zren) (@Zren, the original author) own `plasma6`
+work-in-progress branch and `kpac` porting tool. See [Changelog.md](Changelog.md) for what
+changed. It remains licensed under the GPL, same as upstream.
+
+```
+git clone -b plasma6 https://github.com/Natetronn/plasma-applet-eventcalendar.git eventcalendar
+cd eventcalendar
+sh ./install --restart
+```
+
+The rest of this ReadMe describes the original (Plasma 5) applet; most of it — screenshots,
+configuration steps, the KDE Store listing — still applies as-is.
+
 ## Screenshots
 
 ![](https://i.imgur.com/qdJ71sb.jpg)

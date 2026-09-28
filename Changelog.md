@@ -1,3 +1,14 @@
+## v76.1 - Sep 28 2026 (Plasma 6 port, by Nathan Doyle / @Natetronn)
+
+* Port the whole applet to Plasma 6 / Qt6: `PlasmoidItem`, `Plasma5Support.DataSource`,
+  `org.kde.plasma.workspace.calendar`'s new `EventPluginsManager`/plugin-id API, and the
+  full config UI (QtQuick.Controls 1 → 2), since none of these exist as before on Plasma 6.
+* Restore the Google Calendar, Google Tasks, and Plasma/Akonadi calendar backends, which
+  were left disabled in the upstream Plasma 6 work-in-progress branch.
+* Fix the network status check to use Plasma 6's real `connectivity` property instead of
+  the old (now non-reactive) `networkStatus` string.
+* Built on top of Chris Holland's (@Zren) own `plasma6` branch and its `kpac` porting tool.
+
 ## v76 - May 3 2022
 
 * Do not show calendar border by default anymore.
