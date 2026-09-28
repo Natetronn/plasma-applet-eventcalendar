@@ -5,14 +5,17 @@ import org.kde.plasma.core as PlasmaCore
 import "lib"
 import "lib/ColorUtil.js" as ColorUtil
 
-QtObject {
+// Kirigami.Theme is an attached property resolved by walking the visual (Item) parent
+// chain, so this can't be a plain QtObject like it was when it only used PlasmaCore's
+// "theme" context property.
+Item {
 	id: config
 
 	property bool showIconOutline: plasmoid.configuration.showOutlines
 
 	property color alternateBackgroundColor: {
 		var textColor = Kirigami.Theme.textColor
-		var bgColor = Kirigami.Theme.buttonBackgroundColor
+		var bgColor = Kirigami.Theme.alternateBackgroundColor
 		if (ColorUtil.hasEnoughContrast(textColor, bgColor)) {
 			return bgColor
 		} else {

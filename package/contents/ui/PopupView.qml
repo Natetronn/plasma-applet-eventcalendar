@@ -83,7 +83,7 @@ MouseArea {
 
 	Connections {
 		target: monthView
-		onDateSelected: {
+		function onDateSelected() {
 			// logger.debug('onDateSelected', selectedDate)
 			scrollToSelection()
 		}
@@ -260,7 +260,7 @@ MouseArea {
 				anchors.fill: parent
 				anchors.margins: Kirigami.Units.smallSpacing
 				color: "transparent"
-				border.color: Kirigami.Theme.buttonBackgroundColor
+				border.color: Kirigami.Theme.backgroundColor
 				border.width: 1
 
 				readonly property string message: {

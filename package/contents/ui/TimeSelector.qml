@@ -142,7 +142,7 @@ PlasmaComponents3.TextField {
 				margins: -1
 			}
 			radius: 2
-			color: Kirigami.Theme.viewBackgroundColor
+			color: Kirigami.Theme.backgroundColor
 			border.color: Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.3)
 			layer.enabled: true
 

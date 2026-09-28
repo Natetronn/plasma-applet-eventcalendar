@@ -1,18 +1,18 @@
-import QtQuick 2.0
-import QtQuick.Controls 1.0
-import org.kde.kirigami 2.0 as Kirigami
+import QtQuick
+import QtQuick.Controls as QQC2
+import org.kde.kirigami as Kirigami
 
-Button {
+QQC2.Button {
 	id: colorTextButton
-	property int padding: Kirigami.Units.smallSpacing
+	padding: Kirigami.Units.smallSpacing // Control.padding is a real (FINAL) property; just set it, don't redeclare it
 	implicitWidth: padding + colorTextLabel.implicitWidth + padding
 	implicitHeight: padding + colorTextLabel.implicitHeight + padding
 
 	property alias label: colorTextLabel.text
 
-	Label {
+	QQC2.Label {
 		id: colorTextLabel
 		anchors.centerIn: parent
-		color: Kirigami.Theme.buttonTextColor
+		color: Kirigami.Theme.textColor
 	}
 }
