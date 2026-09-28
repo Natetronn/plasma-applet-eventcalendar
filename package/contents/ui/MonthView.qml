@@ -68,8 +68,8 @@ PinchArea {
 
 	property QtObject calendarBackend: calendarBackend
 
-	onPinchStarted: stack.currentItem.transformOrigin = pinch.center
-	onPinchUpdated: {
+	onPinchStarted: function(pinch) { stack.currentItem.transformOrigin = pinch.center }
+	onPinchUpdated: function(pinch) {
 		var item = stack.currentItem
 		if (stack.depth < 3 && pinch.scale < 1) {
 			item.transformScale = pinch.scale
@@ -399,8 +399,8 @@ PinchArea {
 
 			dateMatchingPrecision: PlasmaCalendar.Calendar.MatchYearMonthAndDay
 
-			previousLabel: i18nd("libplasma5", "Previous Month")
-			nextLabel: i18nd("libplasma5", "Next Month")
+			previousLabel: i18nd("plasmashellprivateplugin", "Previous Month")
+			nextLabel: i18nd("plasmashellprivateplugin", "Next Month")
 
 			onPrevious: calendarBackend.previousMonth()
 			onNext: calendarBackend.nextMonth()
@@ -433,8 +433,8 @@ PinchArea {
 
 			gridModel: monthModel
 
-			previousLabel: i18nd("libplasma5", "Previous Year")
-			nextLabel: i18nd("libplasma5", "Next Year")
+			previousLabel: i18nd("plasmashellprivateplugin", "Previous Year")
+			nextLabel: i18nd("plasmashellprivateplugin", "Next Year")
 
 			onPrevious: calendarBackend.previousYear()
 			onNext: calendarBackend.nextYear()
@@ -466,8 +466,8 @@ PinchArea {
 
 			gridModel: yearModel
 
-			previousLabel: i18nd("libplasma5", "Previous Decade")
-			nextLabel: i18nd("libplasma5", "Next Decade")
+			previousLabel: i18nd("plasmashellprivateplugin", "Previous Decade")
+			nextLabel: i18nd("plasmashellprivateplugin", "Next Decade")
 
 			onPrevious: calendarBackend.previousDecade()
 			onNext: calendarBackend.nextDecade()

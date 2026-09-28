@@ -166,12 +166,12 @@ Item {
 		PlasmaComponents3.ToolButton {
 			icon.name: "go-jump-today"
 			onClicked: root.resetToToday()
-			property string tooltip: i18ndc("libplasma5", "Reset calendar to today", "Today")
+			property string tooltip: i18ndc("plasmashellprivateplugin", "Reset calendar to today", "Today")
 			QQC2.ToolTip.delay: Kirigami.Units.toolTipDelay
 			QQC2.ToolTip.text: tooltip
 			QQC2.ToolTip.visible: hovered
 			Accessible.name: tooltip
-			Accessible.description: i18nd("libplasma5", "Reset calendar to today")
+			Accessible.description: i18nd("plasmashellprivateplugin", "Reset calendar to today")
 			//SEE QTBUG-58307
 			Layout.preferredHeight: implicitHeight + implicitHeight%2
 		}
@@ -298,8 +298,8 @@ Item {
 	}
 
 	Connections {
-		target: theme
-		onTextColorChanged: {
+		target: Kirigami.Theme
+		function onTextColorChanged() {
 			canvas.requestPaint()
 		}
 	}
@@ -424,7 +424,7 @@ Item {
 
 				Connections {
 					target: daysCalendar
-					onActivateHighlightedItem: {
+					function onActivateHighlightedItem() {
 						if (delegate.containsMouse) {
 							delegate.clicked(null)
 						}
