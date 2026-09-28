@@ -22,7 +22,7 @@ Item {
 
 	Connections {
 		target: eventModel
-		onEventCreated: {
+		function onEventCreated(calendarId, data) {
 			notificationManager.notify({
 				appName: i18n("Event Calendar"),
 				appIcon: "resource-calendar-insert",
@@ -34,7 +34,7 @@ Item {
 				})
 			})
 		}
-		onEventDeleted: {
+		function onEventDeleted(calendarId, eventId, data) {
 			logger.logJSON('AgendaView.onEventDeleted', data)
 			notificationManager.notify({
 				appName: i18n("Event Calendar"),
@@ -49,13 +49,21 @@ Item {
 		}
 	}
 
-	QQC2.ScrollView {
+	// Plain Flickable (rather than QQC2.ScrollView, which doesn't expose a "flickableItem"/
+	// "viewport" the way QQC1's did) so contentY/contentHeight stay directly controllable
+	// for scrollToDate/scrollToEvent/scrollToIndex.
+	Flickable {
 		id: agendaScrollView
 		anchors.fill: parent
-		// clip: true
-		readonly property int viewportWidth: viewport ? viewport.width : width
-		readonly property int viewportHeight: viewport ? viewport.height : height
-		readonly property int scrollY: flickableItem ? flickableItem.contentY : 0
+		contentWidth: width
+		contentHeight: agendaColumn.implicitHeight
+		clip: true
+
+		QQC2.ScrollBar.vertical: QQC2.ScrollBar {}
+
+		readonly property int viewportWidth: width
+		readonly property int viewportHeight: height
+		readonly property int scrollY: contentY
 
 		// onScrollYChanged: console.log('scrollY', scrollY)
 
@@ -83,13 +91,13 @@ Item {
 					// Component.onDestruction: console.log(Date.now(), 'AgendaListItem.onDestruction', index)
 				}
 
-				onItemAdded: {
+				function onItemAdded(index, item) {
 					// console.log(Date.now(), 'agendaRepeater.itemAdded', index)
 					if (index === root.agendaModel.count-1) {
 						populated = true
 					}
 				}
-				onItemRemoved: {
+				function onItemRemoved(index, item) {
 					// console.log(Date.now(), 'agendaRepeater.onItemRemoved', index)
 					populated = false
 				}
@@ -139,7 +147,7 @@ Item {
 		}
 
 		function scrollToY(offsetY) {
-			flickableItem.contentY = Math.min(offsetY, contentHeight-viewportHeight)
+			contentY = Math.min(offsetY, contentHeight-viewportHeight)
 		}
 
 		function positionViewAtBeginning() {
