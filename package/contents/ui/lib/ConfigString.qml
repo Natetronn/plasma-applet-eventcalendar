@@ -1,10 +1,10 @@
-// Version 2
+// Version 3
 
-import QtQuick 2.0
-import QtQuick.Controls 1.0
-import QtQuick.Layouts 1.0
+import QtQuick
+import QtQuick.Controls as QQC2
+import QtQuick.Layouts
 
-TextField {
+QQC2.TextField {
 	id: configString
 	Layout.fillWidth: true
 
@@ -21,8 +21,8 @@ TextField {
 	text: configString.configValue
 	onTextChanged: serializeTimer.restart()
 
-	ToolButton {
-		iconName: "edit-clear"
+	QQC2.ToolButton {
+		icon.name: "edit-clear"
 		onClicked: configString.value = defaultValue
 
 		anchors.top: parent.top

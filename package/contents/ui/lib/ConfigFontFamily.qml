@@ -1,8 +1,7 @@
 // Version 2
 
-import QtQuick 2.0
-import QtQuick.Controls 1.0
-import QtQuick.Layouts 1.0
+import QtQuick
+import QtQuick.Layouts
 
 ConfigComboBox {
 	id: configFontFamily

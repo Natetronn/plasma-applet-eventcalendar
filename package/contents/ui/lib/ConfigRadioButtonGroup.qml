@@ -1,8 +1,8 @@
-// Version 4
+// Version 5
 
-import QtQuick 2.0
-import QtQuick.Controls 1.0
-import QtQuick.Layouts 1.0
+import QtQuick
+import QtQuick.Controls as QQC2
+import QtQuick.Layouts
 
 /*
 ** Example:
@@ -23,7 +23,7 @@ RowLayout {
 	default property alias _contentChildren: content.data
 	property alias label: label.text
 
-	property var exclusiveGroup: ExclusiveGroup { id: radioButtonGroup }
+	property var exclusiveGroup: QQC2.ButtonGroup { id: radioButtonGroup }
 
 	property string configKey: ''
 	readonly property var configValue: configKey ? plasmoid.configuration[configKey] : ""
@@ -31,7 +31,7 @@ RowLayout {
 	property alias model: buttonRepeater.model
 
 	//---
-	Label {
+	QQC2.Label {
 		id: label
 		visible: !!text
 		Layout.alignment: Qt.AlignTop | Qt.AlignLeft
@@ -41,12 +41,12 @@ RowLayout {
 
 		Repeater {
 			id: buttonRepeater
-			RadioButton {
+			QQC2.RadioButton {
 				visible: typeof modelData.visible !== "undefined" ? modelData.visible : true
 				enabled: typeof modelData.enabled !== "undefined" ? modelData.enabled : true
 				text: modelData.text
 				checked: modelData.value === configValue
-				exclusiveGroup: radioButtonGroup
+				QQC2.ButtonGroup.group: exclusiveGroup
 				onClicked: {
 					focus = true
 					if (configKey) {

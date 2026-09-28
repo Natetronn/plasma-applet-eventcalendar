@@ -1,8 +1,8 @@
-import QtQuick 2.0
-import QtQuick.Controls 1.0
-import QtQuick.Layouts 1.0
+import QtQuick
+import QtQuick.Controls as QQC2
+import QtQuick.Layouts
 
-GroupBox {
+QQC2.GroupBox {
 	id: colorGrid
 	Layout.fillWidth: true
 	default property alias _contentChildren: content.data

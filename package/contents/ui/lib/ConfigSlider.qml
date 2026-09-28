@@ -1,17 +1,17 @@
-// Version 2
+// Version 3
 
-import QtQuick 2.0
-import QtQuick.Controls 1.0
-import QtQuick.Layouts 1.0
+import QtQuick
+import QtQuick.Controls as QQC2
+import QtQuick.Layouts
 
 RowLayout {
 	id: configSlider
 
 	property string configKey: ''
-	property alias maximumValue: slider.maximumValue
-	property alias minimumValue: slider.minimumValue
+	property alias maximumValue: slider.to
+	property alias minimumValue: slider.from
 	property alias stepSize: slider.stepSize
-	property alias updateValueWhileDragging: slider.updateValueWhileDragging
+	property alias updateValueWhileDragging: slider.live
 	property alias value: slider.value
 
 	property alias before: labelBefore.text
@@ -19,23 +19,23 @@ RowLayout {
 
 	Layout.fillWidth: true
 
-	Label {
+	QQC2.Label {
 		id: labelBefore
 		text: ""
 		visible: text
 	}
-	
-	Slider {
+
+	QQC2.Slider {
 		id: slider
 		Layout.fillWidth: configSlider.Layout.fillWidth
 
 		value: plasmoid.configuration[configKey]
 		// onValueChanged: plasmoid.configuration[configKey] = value
 		onValueChanged: serializeTimer.start()
-		maximumValue: 2147483647
+		to: 2147483647
 	}
 
-	Label {
+	QQC2.Label {
 		id: labelAfter
 		text: ""
 		visible: text

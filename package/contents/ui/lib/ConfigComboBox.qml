@@ -1,8 +1,8 @@
-// Version 5
+// Version 6
 
-import QtQuick 2.0
-import QtQuick.Controls 1.0
-import QtQuick.Layouts 1.0
+import QtQuick
+import QtQuick.Controls as QQC2
+import QtQuick.Layouts
 
 /*
 ** Example:
@@ -55,16 +55,16 @@ RowLayout {
 		selectValue(configValue)
 	}
 
-	Label {
+	QQC2.Label {
 		id: labelBefore
 		text: ""
 		visible: text
 	}
 
-	ComboBox {
+	QQC2.ComboBox {
 		id: comboBox
 		textRole: "text" // Doesn't autodeduce from model if we manually populate it
-		property string valueRole: "value"
+		valueRole: "value" // QQC2.ComboBox.valueRole is a real (FINAL) property; just set it, don't redeclare it
 
 		model: []
 
@@ -81,7 +81,7 @@ RowLayout {
 		}
 	}
 
-	Label {
+	QQC2.Label {
 		id: labelAfter
 		text: ""
 		visible: text

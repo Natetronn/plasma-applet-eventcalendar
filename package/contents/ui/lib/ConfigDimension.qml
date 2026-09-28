@@ -1,9 +1,8 @@
 // Version 2
 
-import QtQuick 2.0
-import QtQuick.Controls 1.0
-import QtQuick.Layouts 1.0
-import org.kde.kirigami 2.0 as Kirigami
+import QtQuick
+import QtQuick.Layouts
+import org.kde.kirigami as Kirigami
 
 GridLayout {
 	id: configDimension
@@ -16,7 +15,6 @@ GridLayout {
 
 	property alias configKey: configSpinBox.configKey
 	property alias configValue: configSpinBox.configValue
-	property alias horizontalAlignment: configSpinBox.horizontalAlignment
 	property alias maximumValue: configSpinBox.maximumValue
 	property alias minimumValue: configSpinBox.minimumValue
 	property alias prefix: configSpinBox.prefix

@@ -1,11 +1,11 @@
-// Version 5
+// Version 6
 
-import QtQuick 2.0
-import QtQuick.Controls 1.0
-import QtQuick.Layouts 1.0
-import QtQuick.Dialogs 1.2
-import QtQuick.Window 2.2
-import org.kde.kirigami 2.0 as Kirigami
+import QtQuick
+import QtQuick.Controls as QQC2
+import QtQuick.Layouts
+import QtQuick.Dialogs
+import QtQuick.Window
+import org.kde.kirigami as Kirigami
 
 import ".."
 
@@ -27,7 +27,7 @@ RowLayout {
 		}
 	}
 
-	property TextField textField: textField
+	property QQC2.TextField textField: textField
 	property ColorDialog dialog: dialog
 
 	property string configKey: ''
@@ -66,7 +66,7 @@ RowLayout {
 		textField.text = newColor
 	}
 
-	Label {
+	QQC2.Label {
 		id: label
 		text: "Label"
 		Layout.fillWidth: horizontalAlignment == Text.AlignRight
@@ -89,7 +89,7 @@ RowLayout {
 		}
 	}
 
-	TextField {
+	QQC2.TextField {
 		id: textField
 		placeholderText: defaultColor ? defaultColor : "#AARRGGBB"
 		Layout.fillWidth: label.horizontalAlignment == Text.AlignLeft
@@ -107,15 +107,11 @@ RowLayout {
 
 	ColorDialog {
 		id: dialog
-		visible: false
+		property bool showAlphaChannel: true
 		modality: Qt.WindowModal
 		title: configColor.label
-		showAlphaChannel: true
-		color: configColor.valueColor
-		onCurrentColorChanged: {
-			if (visible && color != currentColor) {
-				configColor.value = currentColor
-			}
-		}
+		options: showAlphaChannel ? ColorDialog.ShowAlphaChannel : 0
+		selectedColor: configColor.valueColor
+		onAccepted: configColor.value = selectedColor
 	}
 }

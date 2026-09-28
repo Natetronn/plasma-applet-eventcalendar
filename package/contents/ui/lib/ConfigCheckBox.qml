@@ -1,12 +1,12 @@
-// Version 2
+// Version 3
 
-import QtQuick 2.0
-import QtQuick.Controls 1.0
-import QtQuick.Layouts 1.0
+import QtQuick
+import QtQuick.Controls as QQC2
+import QtQuick.Layouts
 
 import ".."
 
-CheckBox {
+QQC2.CheckBox {
 	id: configCheckBox
 
 	property string configKey: ''
