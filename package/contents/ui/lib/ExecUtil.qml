@@ -7,18 +7,26 @@ Plasma5Support.DataSource {
 	id: executable
 	engine: "executable"
 	connectedSources: []
-	function onNewData(sourceName, data) {
-		var cmd = sourceName
-		var exitCode = data["exit code"]
-		var exitStatus = data["exit status"]
-		var stdout = data["stdout"]
-		var stderr = data["stderr"]
-		var listener = listeners[cmd]
-		if (listener) {
-			listener(cmd, exitCode, exitStatus, stdout, stderr)
-		}
-		exited(cmd, exitCode, exitStatus, stdout, stderr)
-		disconnectSource(sourceName) // cmd finished
+
+	// A bare `function onNewData(...) {}` declared directly on this object never actually
+	// fired in live testing (confirmed: zero callbacks across 20+ real commands, both
+	// short-lived and long-running). Wrapping it in a Connections{} isn't an option either -
+	// DataSource has no default property to hold child items ("Cannot assign to non-existent
+	// default property"). Connecting the signal explicitly in JS instead.
+	Component.onCompleted: {
+		newData.connect(function(sourceName, data) {
+			var cmd = sourceName
+			var exitCode = data["exit code"]
+			var exitStatus = data["exit status"]
+			var stdout = data["stdout"]
+			var stderr = data["stderr"]
+			var listener = executable.listeners[cmd]
+			if (listener) {
+				listener(cmd, exitCode, exitStatus, stdout, stderr)
+			}
+			executable.exited(cmd, exitCode, exitStatus, stdout, stderr)
+			executable.disconnectSource(sourceName) // cmd finished
+		})
 	}
 
 	signal exited(string cmd, int exitCode, int exitStatus, string stdout, string stderr)
