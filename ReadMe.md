@@ -81,7 +81,8 @@ sh ./uninstall
 ## Configure
 
 1. Right click the Calendar > Event Calendar Settings > Google Calendar
-2. Copy the Code and enter it at the given link. Keep the settings window open.
+2. Follow the numbered steps shown there to create your own free Google OAuth client, then
+   click Login - this opens your browser to Google's login page.
 3. After the settings window says it's synched, click apply.
 4. Go to the Weather Tab > Enter your city id for OpenWeatherMap. If their search can't find your city, try googling it with [site:openweathermap.org/city](https://www.google.ca/search?q=site%3Aopenweathermap.org%2Fcity+toronto).
 

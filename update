@@ -1,4 +1,4 @@
 #!/bin/bash
 
-git pull origin master
+git pull origin "$(git rev-parse --abbrev-ref HEAD)"
 source ./install

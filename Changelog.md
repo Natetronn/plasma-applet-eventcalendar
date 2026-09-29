@@ -7,6 +7,21 @@
   were left disabled in the upstream Plasma 6 work-in-progress branch.
 * Fix the network status check to use Plasma 6's real `connectivity` property instead of
   the old (now non-reactive) `networkStatus` string.
+* Replace Google Calendar login's dead "out-of-band" OAuth flow (Google shut it down in
+  2022-2023) with the loopback redirect flow, using a local one-shot Python listener since
+  Google's device flow rejects the Tasks scope this applet also needs.
+* Fix a Qt6/KF6-specific bug where a bare `function onSignal(){}` handler declared on the
+  same object that emits a signal doesn't reliably auto-connect (confirmed for both a
+  `Plasma5Support.DataSource`'s C++ `newData` signal and a plain QML-declared signal) -
+  this was silently breaking `ExecUtil`'s exec() callbacks and all calendar event parsing.
+* Fix the agenda never showing any events: every calendar source's own event-parsing
+  override skipped the step that sets each event's start/end date, which then crashed the
+  date-comparison used to place events on the calendar, silently aborting the whole render.
+* Fix the weather forecast (including the meteogram) often not appearing in the popup even
+  though it had already been fetched successfully, by repainting from existing data
+  whenever the popup opens instead of only after the next fetch completes.
+* Fix Google Calendar event links breaking for hyphenated event IDs and for recurring
+  events (eg. birthdays), which Google's direct edit-link endpoint doesn't support.
 * Built on top of Chris Holland's (@Zren) own `plasma6` branch and its `kpac` porting tool.
 
 ## v76 - May 3 2022
