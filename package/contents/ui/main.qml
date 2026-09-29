@@ -214,14 +214,20 @@ PlasmoidItem {
 			id: pinButton
 			visible: isPinVisible
 			anchors.right: parent.right
-			width: Math.round(Kirigami.Units.gridUnit * 1.25)
-			height: width
 			checkable: true
 			icon.name: "window-pin"
 			checked: plasmoid.configuration.pin
 			onCheckedChanged: plasmoid.configuration.pin = checked
 		}
 
+		// Opens the settings dialog without having to right-click the widget (which still works too)
+		PlasmaComponents3.ToolButton {
+			id: menuButton
+			visible: isPinVisible
+			anchors.right: pinButton.visible ? pinButton.left : parent.right
+			icon.name: "application-menu"
+			onClicked: plasmoid.requestConfiguration()
+		}
 	}
 
 	Plasmoid.backgroundHints: plasmoid.configuration.showBackground ? PlasmaCore.Types.DefaultBackground : PlasmaCore.Types.NoBackground
