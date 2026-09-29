@@ -110,63 +110,43 @@ ConfigPage {
 	}
 	ColumnLayout {
 		visible: !googleLoginManager.isLoggedIn
+
 		QQC2.Label {
 			Layout.fillWidth: true
-			text: i18n("To sync with Google Calendar, set up your own OAuth client below, then login.")
+			text: i18n("Google no longer allows widgets to share one login client, so you need your own (free). Follow these steps in order:")
 			color: readableNegativeTextColor
 			wrapMode: Text.Wrap
 		}
-		RowLayout {
-			visible: !googleLoginManager.loggingIn
-			QQC2.Button {
-				text: i18n("Login with Google")
-				onClicked: googleLoginManager.login()
-			}
-		}
-		ColumnLayout {
-			visible: googleLoginManager.loggingIn
-			QQC2.Label {
-				text: googleLoginManager.loginStatusMessage
-			}
-			LinkText {
-				visible: !!googleLoginManager.verificationUrl
-				text: i18n("Go to <a href=\"%1\">%1</a> and enter this code:", googleLoginManager.verificationUrl)
-				wrapMode: Text.Wrap
-			}
-			QQC2.Label {
-				visible: !!googleLoginManager.userCode
-				text: googleLoginManager.userCode
-				font.pixelSize: Kirigami.Units.gridUnit * 1.5
-				font.bold: true
-			}
-			QQC2.Button {
-				text: i18n("Cancel")
-				onClicked: googleLoginManager.cancelLogin()
-			}
-		}
 
-		HeaderText {
-			text: i18n("Google Cloud OAuth Client")
-			level: 3
-		}
-		QQC2.Label {
+		LinkText {
 			Layout.fillWidth: true
-			text: i18n("Google no longer allows widgets to share a single login client, so you'll need your own (free):")
+			text: i18n("1. Open <a href=\"%1\">Google Cloud Console</a> and create a project (or pick an existing one) from the project dropdown at the top.", "https://console.cloud.google.com/projectcreate")
 			wrapMode: Text.Wrap
 		}
 		LinkText {
 			Layout.fillWidth: true
-			text: i18n("1. Open <a href=\"%1\">Google Cloud Console</a> and create/select a project.", "https://console.cloud.google.com/apis/credentials")
+			text: i18n("2. Open <a href=\"%1\">Google Auth Platform</a> and click \"Get started\". Choose user type <b>External</b>, fill in an app name and your email, and finish the wizard.", "https://console.cloud.google.com/auth/overview")
 			wrapMode: Text.Wrap
 		}
 		QQC2.Label {
 			Layout.fillWidth: true
-			text: i18n("2. Enable the Google Calendar API and Google Tasks API for that project.")
+			text: i18n("3. <b>Important:</b> on the \"Audience\" tab, add your own Google account under \"Test users\" — skip this and login will fail with \"access_denied\". Leave publishing status as \"Testing\"; that's fine for personal use and needs no review from Google.")
+			wrapMode: Text.Wrap
+			textFormat: Text.RichText
+		}
+		LinkText {
+			Layout.fillWidth: true
+			text: i18n("4. Open <a href=\"%1\">API Library</a> and enable the <b>Google Calendar API</b> and <b>Google Tasks API</b> for this project.", "https://console.cloud.google.com/apis/library")
+			wrapMode: Text.Wrap
+		}
+		LinkText {
+			Layout.fillWidth: true
+			text: i18n("5. Open <a href=\"%1\">Clients</a>, click \"Create Client\", choose application type <b>Desktop app</b>, give it any name, and create it. (Desktop app clients don't need a redirect URI added — Google automatically allows any http://127.0.0.1:port address for this client type.)", "https://console.cloud.google.com/auth/clients")
 			wrapMode: Text.Wrap
 		}
 		QQC2.Label {
 			Layout.fillWidth: true
-			text: i18n("3. Create an OAuth client ID of type \"TVs and Limited Input devices\" (this is Google's device-login flow, which needs no redirect URI).")
+			text: i18n("6. Copy the Client ID and Client Secret it shows you into the two fields below.")
 			wrapMode: Text.Wrap
 		}
 		RowLayout {
@@ -186,6 +166,28 @@ ConfigPage {
 			}
 		}
 
+		QQC2.Label {
+			Layout.fillWidth: true
+			text: i18n("7. Login:")
+		}
+		RowLayout {
+			QQC2.Button {
+				text: googleLoginManager.loggingIn ? i18n("Waiting for browser…") : i18n("Login with Google")
+				enabled: !googleLoginManager.loggingIn && !!plasmoid.configuration.latestClientId && !!plasmoid.configuration.latestClientSecret
+				onClicked: googleLoginManager.login()
+			}
+			QQC2.BusyIndicator {
+				visible: googleLoginManager.loggingIn
+				running: visible
+				implicitWidth: Kirigami.Units.iconSizes.small
+				implicitHeight: implicitWidth
+			}
+			QQC2.Label {
+				visible: !googleLoginManager.loggingIn && (!plasmoid.configuration.latestClientId || !plasmoid.configuration.latestClientSecret)
+				text: i18n("(fill in the Client ID and Client Secret above first)")
+				color: readableNegativeTextColor
+			}
+		}
 	}
 
 	RowLayout {
