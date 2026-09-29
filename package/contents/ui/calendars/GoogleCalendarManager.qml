@@ -251,9 +251,15 @@ CalendarManager {
 	}
 
 	//--- Parsing Events
+	// This overrides (rather than extends) CalendarManager.onCalendarParsing, so it has to call
+	// defaultEventParsing() itself - the base version, which sets event.startDateTime/endDateTime
+	// from event.start/end, never runs otherwise. Without it, every event's startDateTime is left
+	// undefined, which crashes Shared.js's isSameDate() the moment the agenda tries to place a
+	// second event on the calendar, silently killing the whole agenda render.
 	function onCalendarParsing(calendarId, data) {
 		var calendar = getCalendar(calendarId)
 		data.items.forEach(function(event){
+			defaultEventParsing(calendarId, event)
 			parseEvent(calendar, event)
 		})
 	}

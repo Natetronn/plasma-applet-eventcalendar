@@ -71,7 +71,12 @@ CalendarManager {
 		fetchDebugEvents()
 	}
 
+	// This overrides (rather than extends) CalendarManager.onCalendarParsing, so it has to call
+	// defaultEventParsing() itself - see the matching comment in GoogleCalendarManager.qml.
 	function onCalendarParsing(calendarId, data) {
+		data.items.forEach(function(event) {
+			defaultEventParsing(calendarId, event)
+		})
 		parseEventList(debugCalendar, data.items)
 	}
 
