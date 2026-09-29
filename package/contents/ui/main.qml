@@ -168,6 +168,22 @@ PlasmoidItem {
 			if (isExpanded) {
 				updateToday()
 				logic.updateWeather()
+				// The hourly/meteogram forecast is only ever fetched from deferredUpdateWeather(),
+				// which requires a live popup AND only runs once an hour (see updateWeather()'s
+				// shouldUpdate gate). On a fresh start the popup doesn't exist yet, so that first
+				// opportunity is always skipped - the meteogram would otherwise stay empty until
+				// the throttle happens to allow another fetch. Fetch it directly, once, the first
+				// time the popup opens with nothing loaded yet.
+				if (showMeteogram && logic.hourlyWeatherData.list.length === 0) {
+					logic.updateHourlyWeather()
+				}
+				// Data fetched while the popup was closed (eg. on the periodic poll timer, or
+				// right after logging in from the settings page) never reaches the UI: the
+				// fetch-completion callbacks only call popup.updateUI()/updateMeteogram() if a
+				// popup already exists at that moment. Repaint from whatever's already been
+				// fetched every time the popup opens, instead of only on the next fetch.
+				updateUI()
+				updateMeteogram()
 			}
 		}
 
