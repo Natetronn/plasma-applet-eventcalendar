@@ -22,6 +22,9 @@
   whenever the popup opens instead of only after the next fetch completes.
 * Fix Google Calendar event links breaking for hyphenated event IDs and for recurring
   events (eg. birthdays), which Google's direct edit-link endpoint doesn't support.
+* Use a normal-sized pin icon (it had a hardcoded small size) and add a hamburger menu
+  button next to it that opens the settings dialog directly, without needing to
+  right-click the widget (which still works too).
 * Built on top of Chris Holland's (@Zren) own `plasma6` branch and its `kpac` porting tool.
 
 ## v76 - May 3 2022
