@@ -54,7 +54,7 @@ Item {
 
 	//--- Calendar data
 	function setCalendarData(calendarId, data) {
-		calendarParsing(calendarId, data)
+		onCalendarParsing(calendarId, data)
 		eventsByCalendar[calendarId] = data
 		calendarFetched(calendarId, data)
 	}
@@ -115,24 +115,26 @@ Item {
 
 	// Implementation
 	signal fetchAllCalendars()
-	signal calendarParsing(string calendarId, var data)
-	signal eventParsing(string calendarId, var event)
 
+	// onCalendarParsing/onEventParsing used to be triggered by emitting calendarParsing/
+	// eventParsing signals and relying on this object's own bare `function onX(){}` handlers
+	// to auto-connect. That never actually fires in this Qt6/KF6 build for a plain QML-declared
+	// signal being handled on the same object that emits it (confirmed live - the base
+	// implementation below silently never ran for any calendar source). setCalendarData() below
+	// now calls onCalendarParsing() directly instead.
+	//
 	// Parsing order:
-	// CalendarManager.onCalendarParsing
-	// CalendarManager.onEventParsing
-	// SubClass.onEventParsing
+	// CalendarManager.onCalendarParsing (or SubClass.onCalendarParsing, which replaces it -
+	//   subclasses that override this must call defaultEventParsing() themselves)
+	// CalendarManager.onEventParsing / SubClass.onEventParsing
 	// CalendarManager.defaultEventParsing
-	// SubClass.onCalendarParsing
 	function onCalendarParsing(calendarId, data) {
-		// logger.debug('CalendarManager.calendarParsing(', calendarManager, ')', calendarId)
 		data.items.forEach(function(event) {
-			eventParsing(calendarId, event)
+			onEventParsing(calendarId, event)
 			defaultEventParsing(calendarId, event)
 		})
 	}
 	function onEventParsing(calendarId, event) {
-		// logger.debug('CalendarManager.eventParsing(', calendarManager, ')', calendarId)
 	}
 
 	// To simplify repeated code amongst implementations,
@@ -159,7 +161,7 @@ Item {
 	}
 
 	function parseSingleEvent(calendarId, event) {
-		calendarParsing(calendarId, {
+		onCalendarParsing(calendarId, {
 			items: [event],
 		})
 	}
