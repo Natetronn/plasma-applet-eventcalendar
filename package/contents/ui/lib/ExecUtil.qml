@@ -53,11 +53,27 @@ Plasma5Support.DataSource {
 		return str.replace(/[\'\"]/g, '')
 	}
 
+	// The "executable" engine silently no-ops connectSource() if this exact source string is
+	// already connected (eg. a previous call with the same command that hasn't finished/been
+	// disconnected yet) - it won't launch a second process. Pad the string with trailing
+	// spaces until it's not already in connectedSources, so a repeat of the same command
+	// (identical args, like this app's fixed-port OAuth login command) always actually runs.
+	function getUniqueId(cmd) {
+		var cmd2 = cmd
+		for (var i = 0; i < 10; i++) {
+			if (executable.connectedSources.includes(cmd2)) {
+				cmd2 += ' '
+			}
+		}
+		return cmd2
+	}
+
 	function exec(cmd, callback) {
 		if (Array.isArray(cmd)) {
 			cmd = cmd.map(wrapToken)
 			cmd = cmd.join(' ')
 		}
+		cmd = getUniqueId(cmd)
 		if (typeof callback === 'function') {
 			if (listeners[cmd]) { // Our implementation only allows 1 callback per command.
 				exited.disconnect(listeners[cmd])
