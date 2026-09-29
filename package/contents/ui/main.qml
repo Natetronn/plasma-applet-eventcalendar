@@ -226,7 +226,7 @@ PlasmoidItem {
 			visible: isPinVisible
 			anchors.right: pinButton.visible ? pinButton.left : parent.right
 			icon.name: "application-menu"
-			onClicked: plasmoid.requestConfiguration()
+			onClicked: plasmoid.internalAction("configure").trigger()
 		}
 	}
 
