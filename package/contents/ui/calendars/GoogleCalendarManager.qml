@@ -280,8 +280,16 @@ CalendarManager {
 			// user to click the edit icon after loading the page.
 			// Example htmlLink: "https://www.google.com/calendar/event?eid=...&ctz=Etc/UTC"
 			// Which redirects to: "https://calendar.google.com/calendar/u/0/r/month/2021/12/31?eid=...&sf=true"
-			if (plasmoid.configuration.googleEventClickAction == 'WebEventView') {
-				var eidRegex = /eid=(\w+)(\&|$)/
+			// Google's /r/eventedit/<eid> only resolves single/master events, not individual
+			// instances of a recurring event ("Could not open requested event") - same
+			// limitation as event.canEdit above, so skip the rewrite the same way and fall back
+			// to the default month-view link for those.
+			if (plasmoid.configuration.googleEventClickAction == 'WebEventView' && !event.recurringEventId) {
+				// eid is URL-safe base64 (RFC 4648 section 5), whose alphabet includes '-' and '_'.
+				// \w matches '_' but not '-', so it silently truncated any eid containing a
+				// hyphen - which is common - producing a broken link that Google's edit-by-id
+				// endpoint can't resolve ("Calendar could not load the data").
+				var eidRegex = /eid=([\w-]+)(\&|$)/
 				var eidMatch = eidRegex.exec(event.htmlLink)
 				if (eidMatch) {
 					var eid = eidMatch[1]
